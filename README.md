@@ -5,9 +5,7 @@ Jinja2 support for sanic
 
 ## Installation
 
-`current only from github`
-
-`pip install https://github.com/lixxu/sanic-jinja2/archive/master.zip`
+`pip install sanic-jinja2`
 
 
 ## Usage
