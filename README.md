@@ -12,7 +12,12 @@ Jinja2 support for sanic
 
 ## Usage
 
-`NOTICE: If you want to use flash and get_flashed_messages, you need setup session first`
+```
+NOTICE:
+If you want to use flash and get_flashed_messages, you need setup session first
+
+Currently, app and request are hooked into jinja templates, thus you can use them in template directly.
+```
 
 
 ```python
