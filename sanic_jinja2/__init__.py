@@ -12,6 +12,12 @@ class SanicJinja2:
         if app:
             self.init_app(app, jinja_loader)
 
+    def add_env(self, name, obj, scope='globals'):
+        if scope == 'globals':
+            self.env.globals[name] = obj
+        elif scope == 'filters':
+            self.env.filters[name] = obj
+
     def init_app(self, app, loader=None):
         if not hasattr(app, 'extensions'):
             app.extensions = {}
@@ -21,14 +27,14 @@ class SanicJinja2:
             loader = PackageLoader(app.name, 'templates')
 
         self.env.loader = loader
-        self.env.globals['app'] = app
+        self.add_env('app', app)
 
         @app.middleware('request')
         async def hook_request_to_jinja2(request):
             self.flash = partial(self._flash, request)
-            self.env.globals['request'] = request
-            self.env.globals['get_flashed_messages'] = \
-                partial(self._get_flashed_messages, request)
+            self.add_env('request', request)
+            self.add_env('get_flashed_messages',
+                         partial(self._get_flashed_messages, request))
 
     def render_string(self, template, **context):
         return self.env.get_template(template).render(**context)
