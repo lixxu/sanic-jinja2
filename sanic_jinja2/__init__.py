@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from functools import partial
@@ -28,6 +28,8 @@ class SanicJinja2:
 
         self.env.loader = loader
         self.add_env('app', app)
+        self.add_env('url_for', app.url_for)
+        self.add_env('_', self.fake_trans)
 
         @app.middleware('request')
         async def hook_request_to_jinja2(request):
@@ -35,6 +37,9 @@ class SanicJinja2:
             self.add_env('request', request)
             self.add_env('get_flashed_messages',
                          partial(self._get_flashed_messages, request))
+
+    def fake_trans(self, text, *args, **kwargs):
+        return text
 
     def render_string(self, template, **context):
         return self.env.get_template(template).render(**context)
