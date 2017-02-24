@@ -24,6 +24,7 @@ class SanicJinja2:
             app.extensions = {}
 
         app.extensions['jinja2'] = self
+        app.jinja_env = self.env
         if not loader:
             loader = PackageLoader(app.name, 'templates')
 
