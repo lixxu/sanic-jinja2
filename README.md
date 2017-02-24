@@ -15,6 +15,9 @@ NOTICE:
 If you want to use flash and get_flashed_messages, you need setup session first
 
 Currently, app and request are hooked into jinja templates, thus you can use them in template directly.
+
+And, from version 0.3.0 enable_async is default to True.
+If you need sync functions, use jinja.render_sync, jinja.render_string_sync
 ```
 
 
@@ -57,7 +60,7 @@ Currently, app and request are hooked into jinja templates, thus you can use the
         jinja.flash('info message', 'info')
         jinja.flash('warning message', 'warning')
         jinja.flash('error message', 'error')
-        return jinja.render('index.html', greetings='Hello, sanic!')
+        return await jinja.render('index.html', greetings='Hello, sanic!')
 
 
     if __name__ == '__main__':

@@ -8,6 +8,7 @@ from jinja2 import Environment, PackageLoader
 
 class SanicJinja2:
     def __init__(self, app=None, jinja_loader=None, **kwargs):
+        kwargs.setdefault('enable_async', True)
         self.env = Environment(**kwargs)
         if app:
             self.init_app(app, jinja_loader)
@@ -41,11 +42,17 @@ class SanicJinja2:
     def fake_trans(self, text, *args, **kwargs):
         return text
 
-    def render_string(self, template, **context):
+    async def render_string(self, template, **context):
+        return await self.env.get_template(template).render_async(**context)
+
+    async def render(self, template, **context):
+        return html(await self.render_string(template, **context))
+
+    def render_string_sync(self, template, **context):
         return self.env.get_template(template).render(**context)
 
-    def render(self, template, **context):
-        return html(self.render_string(template, **context))
+    def render_sync(self, template, **context):
+        return html(self.render_string_sync(template, **context))
 
     def _flash(self, request, message, category='message'):
         '''need sanic_session extension'''
