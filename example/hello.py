@@ -27,11 +27,12 @@ async def save_session(request, response):
 
 @app.route('/')
 async def index(request):
-    jinja.flash('success message', 'success')
-    jinja.flash('info message', 'info')
-    jinja.flash('warning message', 'warning')
-    jinja.flash('error message', 'error')
-    return await jinja.render('index.html', greetings='Hello, sanic!')
+    request['flash']('success message', 'success')
+    request['flash']('info message', 'info')
+    request['flash']('warning message', 'warning')
+    request['flash']('error message', 'error')
+    return await jinja.render('index.html', greetings='Hello, sanic!',
+                              request=request)
 
 
 if __name__ == '__main__':

@@ -7,11 +7,11 @@ from jinja2 import Environment, PackageLoader
 
 
 class SanicJinja2:
-    def __init__(self, app=None, jinja_loader=None, **kwargs):
+    def __init__(self, app=None, loader=None, **kwargs):
         kwargs.setdefault('enable_async', True)
         self.env = Environment(**kwargs)
         if app:
-            self.init_app(app, jinja_loader)
+            self.init_app(app, loader)
 
     def add_env(self, name, obj, scope='globals'):
         if scope == 'globals':
@@ -34,22 +34,28 @@ class SanicJinja2:
         self.add_env('_', self.fake_trans)
 
         @app.middleware('request')
-        async def hook_request_to_jinja2(request):
-            self.flash = partial(self._flash, request)
-            self.add_env('request', request)
-            self.add_env('get_flashed_messages',
-                         partial(self._get_flashed_messages, request))
+        async def add_flash_to_request(request):
+            if 'flash' not in request:
+                request['flash'] = partial(self._flash, request)
 
     def fake_trans(self, text, *args, **kwargs):
         return text
 
+    def update_request_context(self, context):
+        if 'request' in context:
+            context.setdefault('get_flashed_messages',
+                               partial(self._get_flashed_messages,
+                                       context['request']))
+
     async def render_string(self, template, **context):
+        self.update_request_context(context)
         return await self.env.get_template(template).render_async(**context)
 
     async def render(self, template, **context):
         return html(await self.render_string(template, **context))
 
     def render_string_sync(self, template, **context):
+        self.update_request_context(context)
         return self.env.get_template(template).render(**context)
 
     def render_sync(self, template, **context):

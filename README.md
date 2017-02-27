@@ -18,6 +18,8 @@ Currently, app and request are hooked into jinja templates, thus you can use the
 
 And, from version 0.3.0 enable_async is default to True.
 If you need sync functions, use jinja.render_sync, jinja.render_string_sync
+
+BUG: request should not be set to global environment, so you need use request['flash'] instead of jinja.flash and need pass request to render to use get_flashed_messages.
 ```
 
 
@@ -56,11 +58,12 @@ If you need sync functions, use jinja.render_sync, jinja.render_string_sync
 
     @app.route('/')
     async def index(request):
-        jinja.flash('success message', 'success')
-        jinja.flash('info message', 'info')
-        jinja.flash('warning message', 'warning')
-        jinja.flash('error message', 'error')
-        return await jinja.render('index.html', greetings='Hello, sanic!')
+        request['flash']('success message', 'success')
+        request['flash']('info message', 'info')
+        request['flash']('warning message', 'warning')
+        request['flash']('error message', 'error')
+        return await jinja.render('index.html', greetings='Hello, sanic!',
+                                  request=request)
 
 
     if __name__ == '__main__':
