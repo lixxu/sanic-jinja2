@@ -42,6 +42,7 @@ class SanicJinja2:
         return text
 
     def update_request_context(self, request, context):
+        context.setdefault('request', request)
         context.setdefault('get_flashed_messages',
                            partial(self._get_flashed_messages, request))
 
