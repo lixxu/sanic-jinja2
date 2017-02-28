@@ -50,7 +50,7 @@ class SanicJinja2:
         return await self.env.get_template(template).render_async(**context)
 
     async def render(self, template, request, **context):
-        return html(await self.render_string(template, **context))
+        return html(await self.render_string(template, request, **context))
 
     def render_string_sync(self, template, request, **context):
         self.update_request_context(request, context)
