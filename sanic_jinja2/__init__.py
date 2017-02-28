@@ -41,25 +41,23 @@ class SanicJinja2:
     def fake_trans(self, text, *args, **kwargs):
         return text
 
-    def update_request_context(self, context):
-        if 'request' in context:
-            context.setdefault('get_flashed_messages',
-                               partial(self._get_flashed_messages,
-                                       context['request']))
+    def update_request_context(self, request, context):
+        context.setdefault('get_flashed_messages',
+                           partial(self._get_flashed_messages, request))
 
-    async def render_string(self, template, **context):
-        self.update_request_context(context)
+    async def render_string(self, template, request, **context):
+        self.update_request_context(request, context)
         return await self.env.get_template(template).render_async(**context)
 
-    async def render(self, template, **context):
+    async def render(self, template, request, **context):
         return html(await self.render_string(template, **context))
 
-    def render_string_sync(self, template, **context):
-        self.update_request_context(context)
+    def render_string_sync(self, template, request, **context):
+        self.update_request_context(request, context)
         return self.env.get_template(template).render(**context)
 
-    def render_sync(self, template, **context):
-        return html(self.render_string_sync(template, **context))
+    def render_sync(self, template, request, **context):
+        return html(self.render_string_sync(template, request, **context))
 
     def _flash(self, request, message, category='message'):
         '''need sanic_session extension'''

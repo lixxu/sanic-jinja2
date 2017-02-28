@@ -31,8 +31,7 @@ async def index(request):
     request['flash']('info message', 'info')
     request['flash']('warning message', 'warning')
     request['flash']('error message', 'error')
-    return await jinja.render('index.html', greetings='Hello, sanic!',
-                              request=request)
+    return await jinja.render('index.html', request, greetings='Hello, sanic!')
 
 
 if __name__ == '__main__':

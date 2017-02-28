@@ -62,8 +62,7 @@ BUG: request should not be set to global environment, so you need use request['f
         request['flash']('info message', 'info')
         request['flash']('warning message', 'warning')
         request['flash']('error message', 'error')
-        return await jinja.render('index.html', greetings='Hello, sanic!',
-                                  request=request)
+        return await jinja.render('index.html', request, greetings='Hello, sanic!')
 
 
     if __name__ == '__main__':
