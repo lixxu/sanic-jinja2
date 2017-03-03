@@ -8,6 +8,14 @@ Jinja2 support for sanic
 `pip install sanic-jinja2`
 
 
+## requirements
+
+- python3.6
+- jinja2
+- sanic
+- sanic_session
+
+
 ## Usage
 
 ```
