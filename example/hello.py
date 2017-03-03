@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from sanic import Sanic
@@ -31,7 +31,7 @@ async def index(request):
     request['flash']('info message', 'info')
     request['flash']('warning message', 'warning')
     request['flash']('error message', 'error')
-    return await jinja.render('index.html', request, greetings='Hello, sanic!')
+    return jinja.render('index.html', request, greetings='Hello, sanic!')
 
 
 if __name__ == '__main__':

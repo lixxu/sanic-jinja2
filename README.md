@@ -19,6 +19,8 @@ Currently, app and request are hooked into jinja templates, thus you can use the
 And, from version 0.3.0 enable_async is default to True.
 If you need sync functions, use jinja.render_sync, jinja.render_string_sync
 
+Python3.5 does not support new async syntax, so 0.5.0 disable async back, sorry.
+
 BUG: request should not be set to global environment, so you need use request['flash'] instead of jinja.flash and need pass request to render to use get_flashed_messages.
 ```
 
@@ -62,7 +64,7 @@ BUG: request should not be set to global environment, so you need use request['f
         request['flash']('info message', 'info')
         request['flash']('warning message', 'warning')
         request['flash']('error message', 'error')
-        return await jinja.render('index.html', request, greetings='Hello, sanic!')
+        return jinja.render('index.html', request, greetings='Hello, sanic!')
 
 
     if __name__ == '__main__':
