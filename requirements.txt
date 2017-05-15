@@ -1,0 +1,11 @@
+
+# requirement python3.6
+
+jinja2
+sanic
+sanic_session
+
+
+
+
+
