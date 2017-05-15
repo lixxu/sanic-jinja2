@@ -31,6 +31,7 @@ async def index(request):
     request['flash']('info message', 'info')
     request['flash']('warning message', 'warning')
     request['flash']('error message', 'error')
+    request['session']['user'] = 'session user'
     return jinja.render('index.html', request, greetings='Hello, sanic!')
 
 

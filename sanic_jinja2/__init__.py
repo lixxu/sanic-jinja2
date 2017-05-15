@@ -52,6 +52,9 @@ class SanicJinja2:
             context.setdefault('ngettext', ng)
             context.setdefault('_', context['gettext'])
 
+        if 'session' in request:
+            context.setdefault('session', request['session'])
+
         context.setdefault('_', self.fake_trans)
         context.setdefault('request', request)
         context.setdefault('get_flashed_messages',
