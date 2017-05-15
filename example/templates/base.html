@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.js" integrity="sha256-flVaeawsBV96vCHiLmXn03IRJym7+ZfcLVvUWONCas8=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.css" integrity="sha256-wT6CFc7EKRuf7uyVfi+MQNHUzojuHN2pSw0YWFt2K5E=" crossorigin="anonymous" />
-    <style type="text/css">
+    <style>
     body {
       background-color: #FFFFFF;
     }
@@ -110,7 +110,7 @@
         </div>
       </div>
     </div>
-    <script type="text/javascript">
+    <script>
     $('.message .close')
       .on('click', function() {
         $(this)
@@ -119,7 +119,6 @@
         ;
       })
     ;
-    {% block js %}{% endblock %}
     </script>
   </body>
 </html>

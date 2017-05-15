@@ -8,11 +8,11 @@ from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
 
 class SanicJinja2:
-    def __init__(self, app=None, loader=None, **kwargs):
+    def __init__(self, app=None, loader=None, pkg_name=None, **kwargs):
         self.env = Environment(**kwargs)
         self.app = app
         if app:
-            self.init_app(app, loader)
+            self.init_app(app, loader, pkg_name or app.name)
 
     def add_env(self, name, obj, scope='globals'):
         if scope == 'globals':
@@ -20,7 +20,7 @@ class SanicJinja2:
         elif scope == 'filters':
             self.env.filters[name] = obj
 
-    def init_app(self, app, loader=None):
+    def init_app(self, app, loader=None, pkg_name=None):
         self.app = app
         if not hasattr(app, 'extensions'):
             app.extensions = {}
@@ -28,7 +28,7 @@ class SanicJinja2:
         app.extensions['jinja2'] = self
         app.jinja_env = self.env
         if not loader:
-            loader = PackageLoader(app.name, 'templates')
+            loader = PackageLoader(pkg_name, 'templates')
 
         self.env.loader = loader
         self.add_env('app', app)
