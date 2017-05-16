@@ -6,6 +6,8 @@ from sanic.response import html
 from jinja2 import Environment, PackageLoader
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
+__version__ = '0.5.3'
+
 
 class SanicJinja2:
     def __init__(self, app=None, loader=None, pkg_name=None, **kwargs):
@@ -28,7 +30,7 @@ class SanicJinja2:
         app.extensions['jinja2'] = self
         app.jinja_env = self.env
         if not loader:
-            loader = PackageLoader(pkg_name, 'templates')
+            loader = PackageLoader(pkg_name or app.name, 'templates')
 
         self.env.loader = loader
         self.add_env('app', app)
