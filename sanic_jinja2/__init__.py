@@ -6,16 +6,16 @@ from sanic.response import html
 from jinja2 import Environment, PackageLoader
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
-__version__ = '0.5.4'
+__version__ = '0.5.5'
 
 
 class SanicJinja2:
-    def __init__(self, app=None, loader=None, pkg_name=None, pkg_folder=None,
+    def __init__(self, app=None, loader=None, pkg_name=None, pkg_path=None,
                  **kwargs):
         self.env = Environment(**kwargs)
         self.app = app
         if app:
-            self.init_app(app, loader, pkg_name or app.name, pkg_folder)
+            self.init_app(app, loader, pkg_name or app.name, pkg_path)
 
     def add_env(self, name, obj, scope='globals'):
         if scope == 'globals':
@@ -23,7 +23,7 @@ class SanicJinja2:
         elif scope == 'filters':
             self.env.filters[name] = obj
 
-    def init_app(self, app, loader=None, pkg_name=None, pkg_folder=None):
+    def init_app(self, app, loader=None, pkg_name=None, pkg_path=None):
         self.app = app
         if not hasattr(app, 'extensions'):
             app.extensions = {}
@@ -32,7 +32,7 @@ class SanicJinja2:
         app.jinja_env = self.env
         if not loader:
             loader = PackageLoader(pkg_name or app.name,
-                                   pkg_folder or 'templates')
+                                   pkg_path or 'templates')
 
         self.env.loader = loader
         self.add_env('app', app)
