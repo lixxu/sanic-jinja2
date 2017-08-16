@@ -39,8 +39,9 @@ BUG: request should not be set to global environment, so you need use request['f
     jinja = SanicJinja2(app)
     #
     # Specify the package name, if templates/ dir is inside module
-    # jinja - SanicJinja2(app, pkg_name='sanicapp')
-    #
+    # jinja = SanicJinja2(app, pkg_name='sanicapp')
+    # or use customized templates path
+    # jinja = SanicJinja2(app, pkg_name='sanicapp', pkg_path='other/templates')
     # or setup later
     # jinja = SanicJinja2()
     # jinja.init_app(app)
