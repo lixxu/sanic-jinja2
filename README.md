@@ -5,7 +5,7 @@ Jinja2 support for sanic
 
 ## Installation
 
-`pip install sanic-jinja2`
+`python3 -m pip install sanic-jinja2`
 
 
 ## Usage
