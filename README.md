@@ -27,51 +27,51 @@ BUG: request should not be set to global environment, so you need use request['f
 
 ```python
 
-    #!/usr/bin/env python
-    # -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-    from sanic import Sanic
-    from sanic_session import InMemorySessionInterface
-    from sanic_jinja2 import SanicJinja2
+from sanic import Sanic
+from sanic_session import InMemorySessionInterface
+from sanic_jinja2 import SanicJinja2
 
-    app = Sanic()
+app = Sanic()
 
-    jinja = SanicJinja2(app)
-    #
-    # Specify the package name, if templates/ dir is inside module
-    # jinja = SanicJinja2(app, pkg_name='sanicapp')
-    # or use customized templates path
-    # jinja = SanicJinja2(app, pkg_name='sanicapp', pkg_path='other/templates')
-    # or setup later
-    # jinja = SanicJinja2()
-    # jinja.init_app(app)
+jinja = SanicJinja2(app)
+#
+# Specify the package name, if templates/ dir is inside module
+# jinja = SanicJinja2(app, pkg_name='sanicapp')
+# or use customized templates path
+# jinja = SanicJinja2(app, pkg_name='sanicapp', pkg_path='other/templates')
+# or setup later
+# jinja = SanicJinja2()
+# jinja.init_app(app)
 
-    session = InMemorySessionInterface(cookie_name=app.name, prefix=app.name)
-
-
-    @app.middleware('request')
-    async def add_session_to_request(request):
-        # before each request initialize a session
-        # using the client's request
-        await session.open(request)
+session = InMemorySessionInterface(cookie_name=app.name, prefix=app.name)
 
 
-    @app.middleware('response')
-    async def save_session(request, response):
-        # after each request save the session,
-        # pass the response to set client cookies
-        await session.save(request, response)
+@app.middleware('request')
+async def add_session_to_request(request):
+    # before each request initialize a session
+    # using the client's request
+    await session.open(request)
 
 
-    @app.route('/')
-    async def index(request):
-        request['flash']('success message', 'success')
-        request['flash']('info message', 'info')
-        request['flash']('warning message', 'warning')
-        request['flash']('error message', 'error')
-        return jinja.render('index.html', request, greetings='Hello, sanic!')
+@app.middleware('response')
+async def save_session(request, response):
+    # after each request save the session,
+    # pass the response to set client cookies
+    await session.save(request, response)
 
 
-    if __name__ == '__main__':
-        app.run(host='0.0.0.0', port=8000, debug=True)
+@app.route('/')
+async def index(request):
+    request['flash']('success message', 'success')
+    request['flash']('info message', 'info')
+    request['flash']('warning message', 'warning')
+    request['flash']('error message', 'error')
+    return jinja.render('index.html', request, greetings='Hello, sanic!')
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=True)
 ```
