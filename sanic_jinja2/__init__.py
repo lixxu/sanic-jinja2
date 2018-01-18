@@ -5,6 +5,7 @@ import asyncio
 import functools
 from collections import Mapping
 from sanic.response import html, HTTPResponse
+from sanic.exceptions import ServerError
 from sanic.views import HTTPMethodView
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
@@ -178,7 +179,6 @@ class SanicJinja2:
                 # if request.get(REQUEST_CONTEXT_KEY):
                 #     context = dict(request[REQUEST_CONTEXT_KEY], **context)
                 update_request_context(request, context)
-                print(context)
                 text = template.render(context)
 
                 content_type = "text/html; charset={encoding}".format(
