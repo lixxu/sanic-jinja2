@@ -81,8 +81,7 @@ class SanicJinja2:
                 app.request_middleware.append(self.context_processors)
 
         app.extensions['jinja2'] = self
-        app.jinja2 = self.env
-        # app.jinja2_env = self.env
+        app.jinja_env = self.env
         if not loader:
             loader = PackageLoader(pkg_name or app.name,
                                    pkg_path or 'templates')
