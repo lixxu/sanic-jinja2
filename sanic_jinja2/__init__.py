@@ -156,7 +156,7 @@ class SanicJinja2:
                 if context is None:
                     context = {}
 
-                env = getattr(request.app, 'jinja2', None)
+                env = getattr(request.app, 'jinja_env', None)
                 if not env:
                     raise ServerError(
                         "Template engine has not been initialized yet.",
