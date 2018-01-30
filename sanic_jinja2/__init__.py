@@ -100,9 +100,9 @@ class SanicJinja2:
         update_request_context(request, context)
         return await self.env.get_template(template).render_async(**context)
 
-    async def render_async(self, template, request, **context):
+    async def render_async(self, template, request, status=200, **context):
         return html(await self.render_string_async(template, request,
-                                                   **context))
+                                                   **context), status=status)
 
     def render_source(self, source, request, **context):
         update_request_context(request, context)
@@ -112,8 +112,8 @@ class SanicJinja2:
         update_request_context(request, context)
         return self.env.get_template(template).render(**context)
 
-    def render(self, template, request, **context):
-        return html(self.render_string(template, request, **context))
+    def render(self, template, request, status=200, **context):
+        return html(self.render_string(template, request, **context), status=status)
 
     def _flash(self, request, message, category='message'):
         '''need sanic_session extension'''
