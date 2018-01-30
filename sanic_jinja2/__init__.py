@@ -1,16 +1,17 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from functools import partial
 import asyncio
-import functools
 from collections import Mapping
+import functools
+from functools import partial
 from sanic.response import html, HTTPResponse
 from sanic.exceptions import ServerError
 from sanic.views import HTTPMethodView
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 CONTEXT_PROCESSORS = 'context_processor'
 
@@ -115,6 +116,9 @@ class SanicJinja2:
     def render(self, template, request, **context):
         return html(self.render_string(template, request, **context))
 
+    def update_request_context(self, request, context):
+        update_request_context(request, context)
+
     def _flash(self, request, message, category='message'):
         '''need sanic_session extension'''
         if 'session' in request:
@@ -124,11 +128,12 @@ class SanicJinja2:
 
     @staticmethod
     def template(template_name, encoding='utf-8', headers=None, status=200):
-        """
-        Decorate web-handler to convert returned dict context into sanic.response.Response
+        """Decorate web-handler to convert returned dict context into
+        sanic.response.Response
         filled with template_name template.
         :param template_name: template name.
-        :param request: a parameter from web-handler, sanic.request.Request instance.
+        :param request: a parameter from web-handler,
+                        sanic.request.Request instance.
         :param context: context for rendering.
         """
 
@@ -143,11 +148,13 @@ class SanicJinja2:
 
                 context = yield from coro(*args, **kwargs)
 
-                # wrapped function return HTTPResponse instead of dict-like object
+                # wrapped function return HTTPResponse
+                # instead of dict-like object
                 if isinstance(context, HTTPResponse):
                     return context
 
-                # wrapped function is class method and got `self` as first argument
+                # wrapped function is class method
+                # and got `self` as first argument
                 if isinstance(args[0], HTTPMethodView):
                     request = args[1]
                 else:
@@ -180,8 +187,7 @@ class SanicJinja2:
                 update_request_context(request, context)
                 text = template.render(context)
 
-                content_type = "text/html; charset={encoding}".format(
-                    encoding=encoding)
+                content_type = "text/html; charset={}".format(encoding)
 
                 return HTTPResponse(
                     text, status=status, headers=headers,
