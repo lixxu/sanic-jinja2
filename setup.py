@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='sanic-jinja2',
-    version='0.6.0',
+    version='0.7.0',
     url='https://github.com/lixxu/sanic-jinja2',
     license='BSD',
     author='Lix Xu',
