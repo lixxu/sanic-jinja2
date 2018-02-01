@@ -11,7 +11,7 @@ from sanic.views import HTTPMethodView
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 CONTEXT_PROCESSORS = 'context_processor'
 
@@ -101,9 +101,9 @@ class SanicJinja2:
         update_request_context(request, context)
         return await self.env.get_template(template).render_async(**context)
 
-    async def render_async(self, template, request, **context):
+    async def render_async(self, template, request, status=200, **context):
         return html(await self.render_string_async(template, request,
-                                                   **context))
+                                                   **context), status=status)
 
     def render_source(self, source, request, **context):
         update_request_context(request, context)
@@ -113,8 +113,8 @@ class SanicJinja2:
         update_request_context(request, context)
         return self.env.get_template(template).render(**context)
 
-    def render(self, template, request, **context):
-        return html(self.render_string(template, request, **context))
+    def render(self, template, request, status=200, **context):
+        return html(self.render_string(template, request, **context), status=status)
 
     def update_request_context(self, request, context):
         update_request_context(request, context)
