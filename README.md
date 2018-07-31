@@ -41,7 +41,7 @@ BUG: request should not be set to global environment, so you need use request['f
 # -*- coding: utf-8 -*-
 
 from sanic import Sanic
-from sanic_session import Session, InMemorySessionInterface
+from sanic_session import Session
 from sanic_jinja2 import SanicJinja2
 
 app = Sanic()
