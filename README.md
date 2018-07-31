@@ -45,7 +45,7 @@ from sanic_session import Session, InMemorySessionInterface
 from sanic_jinja2 import SanicJinja2
 
 app = Sanic()
-session = Session(app, interface=InMemorySessionInterface(cookie_name=app.name, prefix=app.name))
+Session(app)
 
 jinja = SanicJinja2(app)
 #
