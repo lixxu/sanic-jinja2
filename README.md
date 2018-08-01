@@ -20,7 +20,6 @@ Jinja2 support for sanic
 
 ## Usage
 
-
 **NOTICE**:
 
 If you want to use `flash` and `get_flashed_messages`, you need setup session first.
@@ -42,10 +41,11 @@ BUG: request should not be set to global environment, so you need use request['f
 # -*- coding: utf-8 -*-
 
 from sanic import Sanic
-from sanic_session import InMemorySessionInterface
+from sanic_session import Session
 from sanic_jinja2 import SanicJinja2
 
 app = Sanic()
+Session(app)
 
 jinja = SanicJinja2(app)
 #
@@ -56,23 +56,6 @@ jinja = SanicJinja2(app)
 # or setup later
 # jinja = SanicJinja2()
 # jinja.init_app(app)
-
-session = InMemorySessionInterface(cookie_name=app.name, prefix=app.name)
-
-
-@app.middleware('request')
-async def add_session_to_request(request):
-    # before each request initialize a session
-    # using the client's request
-    await session.open(request)
-
-
-@app.middleware('response')
-async def save_session(request, response):
-    # after each request save the session,
-    # pass the response to set client cookies
-    await session.save(request, response)
-
 
 @app.route('/')
 @jinja.template('index.html')  # decorator method is staticmethod
