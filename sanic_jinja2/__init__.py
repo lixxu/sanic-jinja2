@@ -101,9 +101,9 @@ class SanicJinja2:
         update_request_context(request, context)
         return await self.env.get_template(template).render_async(**context)
 
-    async def render_async(self, template, request, status=200, **context):
+    async def render_async(self, template, request, status=200, headers=None, **context):
         return html(await self.render_string_async(template, request,
-                                                   **context), status=status)
+                                                   **context), status=status, headers=headers)
 
     def render_source(self, source, request, **context):
         update_request_context(request, context)
@@ -113,8 +113,8 @@ class SanicJinja2:
         update_request_context(request, context)
         return self.env.get_template(template).render(**context)
 
-    def render(self, template, request, status=200, **context):
-        return html(self.render_string(template, request, **context), status=status)
+    def render(self, template, request, status=200, headers=None, **context):
+        return html(self.render_string(template, request, **context), status=status, headers=headers)
 
     def update_request_context(self, request, context):
         update_request_context(request, context)
