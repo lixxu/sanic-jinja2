@@ -11,7 +11,7 @@ from sanic.views import HTTPMethodView
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 CONTEXT_PROCESSORS = 'context_processor'
 
@@ -22,7 +22,7 @@ def fake_trans(text, *args, **kwargs):
 
 def update_request_context(request, context):
     if not request:
-       return
+        return
 
     if 'babel' in request.app.extensions:
         babel = request.app.babel_instance
