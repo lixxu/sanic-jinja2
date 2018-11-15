@@ -21,6 +21,9 @@ def fake_trans(text, *args, **kwargs):
 
 
 def update_request_context(request, context):
+    if not request:
+       return
+
     if 'babel' in request.app.extensions:
         babel = request.app.babel_instance
         g = _make_new_gettext(babel._get_translations(request).ugettext)
