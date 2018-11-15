@@ -1,7 +1,7 @@
 # sanic-jinja2
 Jinja2 support for sanic
 
-![Example](https://github.com/lixxu/sanic-jinja2/blob/master/example/example.png)
+![Example](example/example.png)
 
 ## Installation
 
