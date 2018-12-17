@@ -61,6 +61,7 @@ def _get_flashed_messages(request, with_categories=False,
 class SanicJinja2:
     def __init__(self, app=None, loader=None, pkg_name=None, pkg_path=None,
                  context_processors=None, **kwargs):
+        self.enable_async = kwargs.get('enable_async', False)
         self.env = Environment(**kwargs)
         self.app = app
         self.context_processors = context_processors
@@ -86,6 +87,7 @@ class SanicJinja2:
 
         app.extensions['jinja2'] = self
         app.jinja_env = self.env
+        app.enable_async = self.enable_async
         if not loader:
             loader = PackageLoader(pkg_name or app.name,
                                    pkg_path or 'templates')
@@ -190,8 +192,11 @@ class SanicJinja2:
                     )
                 # if request.get(REQUEST_CONTEXT_KEY):
                 #     context = dict(request[REQUEST_CONTEXT_KEY], **context)
-                update_request_context(request, context)
-                text = template.render(context)
+
+                if request.app.enable_async:
+                    text = yield from template.render_async(context)
+                else:
+                    text = template.render(context)
 
                 content_type = "text/html; charset={}".format(encoding)
 
