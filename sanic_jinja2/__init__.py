@@ -66,7 +66,7 @@ class SanicJinja2:
         context_processors=None,
         **kwargs
     ):
-        self.enable_async = kwargs.get("enable_async", False)
+        self.enable_async = kwargs.get("enable_async", True)
         self.env = Environment(**kwargs)
         self.app = app
         self.context_processors = context_processors
