@@ -205,6 +205,7 @@ class SanicJinja2:
                     )
                 # if request.get(REQUEST_CONTEXT_KEY):
                 #     context = dict(request[REQUEST_CONTEXT_KEY], **context)
+                update_request_context(request, context)
 
                 if request.app.enable_async:
                     text = yield from template.render_async(context)
