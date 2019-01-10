@@ -11,7 +11,7 @@ from sanic.views import HTTPMethodView
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
-__version__ = "0.7.3"
+__version__ = "0.7.4"
 
 CONTEXT_PROCESSORS = "context_processor"
 
