@@ -66,7 +66,7 @@ class SanicJinja2:
         context_processors=None,
         **kwargs
     ):
-        self.enable_async = kwargs.get("enable_async", True)
+        self.enable_async = kwargs.get("enable_async", False)
         self.env = Environment(**kwargs)
         self.app = app
         self.context_processors = context_processors
@@ -145,6 +145,20 @@ class SanicJinja2:
             flashes = request["session"].get("_flashes", [])
             flashes.append((category, message))
             request["session"]["_flashes"] = flashes
+
+    def get_template_attribute(self, template, attribute):
+        """Loads a macro (or variable) a template exports.  This can be used to
+        invoke a macro from within Python code.  If you for example have a
+        template named :file:`_cider.html` with the following contents:
+        .. sourcecode:: html+jinja
+            {% macro hello(name) %}Hello {{ name }}!{% endmacro %}
+        You can access this from Python code like this::
+            hello = get_template_attribute('_cider.html', 'hello')
+            return hello('World')
+        :param template_name: the name of the template
+        :param attribute: the name of the variable of macro to access
+        """
+        return getattr(self.env.get_template(template)._module, attribute)
 
     @staticmethod
     def template(template_name, encoding="utf-8", headers=None, status=200):
