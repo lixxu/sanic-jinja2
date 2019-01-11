@@ -14,7 +14,7 @@ Jinja2 support for sanic
 - Flask-like `flash` method
 - i18n and Babel support
 - `@jinja.template` syntax
-- [session extension](https://github.com/subyraman/sanic_session) support
+- [session extension](https://github.com/xen/sanic_session) support
 - factory pattern `init_app` method for creating apps
 
 
