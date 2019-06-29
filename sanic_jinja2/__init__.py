@@ -11,7 +11,7 @@ from sanic.views import HTTPMethodView
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
-__version__ = "0.7.4"
+__version__ = "0.7.5"
 
 CONTEXT_PROCESSORS = "context_processor"
 
@@ -67,7 +67,8 @@ class SanicJinja2:
         **kwargs
     ):
         self.enable_async = kwargs.get("enable_async", False)
-        self.env = Environment(**kwargs)
+        self.env = Environment(loader=loader, **kwargs)
+        self._loader = loader
         self.app = app
         self.context_processors = context_processors
 
@@ -93,12 +94,14 @@ class SanicJinja2:
         app.extensions["jinja2"] = self
         app.jinja_env = self.env
         app.enable_async = self.enable_async
-        if not loader:
+        if loader:
+            self.env.loader = loader
+        elif not self._loader:
             loader = PackageLoader(
                 pkg_name or app.name, pkg_path or "templates"
             )
+            self.env.loader = loader
 
-        self.env.loader = loader
         self.add_env("app", app)
         self.add_env("url_for", app.url_for)
         self.url_for = app.url_for
