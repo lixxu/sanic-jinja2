@@ -2,22 +2,27 @@
 # -*- coding: utf-8 -*-
 
 import asyncio
-from collections import Mapping
 import functools
+from collections import Mapping
 from functools import partial
-from sanic.response import html, HTTPResponse
-from sanic.exceptions import ServerError
-from sanic.views import HTTPMethodView
+
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
+from sanic.exceptions import ServerError
+from sanic.response import html, HTTPResponse
+from sanic.views import HTTPMethodView
 
-__version__ = "0.7.5"
+__version__ = "0.8.0"
 
 CONTEXT_PROCESSORS = "context_processor"
 
 
 def fake_trans(text, *args, **kwargs):
     return text
+
+
+def get_request_container(request):
+    return request.ctx.__dict__ if hasattr(request, "ctx") else request
 
 
 def update_request_context(request, context):
@@ -32,8 +37,9 @@ def update_request_context(request, context):
         context.setdefault("ngettext", ng)
         context.setdefault("_", context["gettext"])
 
-    if "session" in request:
-        context.setdefault("session", request["session"])
+    req = get_request_container(request)
+    if "session" in req:
+        context.setdefault("session", req["session"])
 
     context.setdefault("_", fake_trans)
     context.setdefault("request", request)
@@ -43,10 +49,11 @@ def update_request_context(request, context):
 
 
 def _get_flashed_messages(request, with_categories=False, category_filter=[]):
-    if "session" not in request:
+    req = get_request_container(request)
+    if "session" not in req:
         return []
 
-    flashes = request["session"].pop("_flashes", [])
+    flashes = req["session"].pop("_flashes", [])
     if category_filter:
         flashes = list(filter(lambda f: f[0] in category_filter, flashes))
 
@@ -108,8 +115,9 @@ class SanicJinja2:
 
         @app.middleware("request")
         async def add_flash_to_request(request):
-            if "flash" not in request:
-                request["flash"] = partial(self._flash, request)
+            req = get_request_container(request)
+            if "flash" not in req:
+                req["flash"] = partial(self._flash, req)
 
     async def render_string_async(self, template, request, **context):
         update_request_context(request, context)
@@ -144,10 +152,11 @@ class SanicJinja2:
 
     def _flash(self, request, message, category="message"):
         """need sanic_session extension"""
-        if "session" in request:
-            flashes = request["session"].get("_flashes", [])
+        req = get_request_container(request)
+        if "session" in req:
+            flashes = req["session"].get("_flashes", [])
             flashes.append((category, message))
-            request["session"]["_flashes"] = flashes
+            req["session"]["_flashes"] = flashes
 
     @staticmethod
     def template(template_name, encoding="utf-8", headers=None, status=200):
@@ -190,14 +199,14 @@ class SanicJinja2:
                 if not env:
                     raise ServerError(
                         "Template engine has not been initialized yet.",
-                        status_code=500
+                        status_code=500,
                     )
                 try:
                     template = env.get_template(template_name)
-                except TemplateNotFound as e:
+                except TemplateNotFound:
                     raise ServerError(
                         "Template '{}' not found".format(template_name),
-                        status_code=500
+                        status_code=500,
                     )
                 if not isinstance(context, Mapping):
                     raise ServerError(
