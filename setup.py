@@ -22,7 +22,7 @@ setup(
     name="sanic-jinja2",
     version=version.replace('"', ""),
     url="https://github.com/lixxu/sanic-jinja2",
-    license="BSD",
+    license="bsd-3-clause",
     author="Lix Xu",
     author_email="xuzenglin@gmail.com",
     description="Jinja2 support for sanic",
