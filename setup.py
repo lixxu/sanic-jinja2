@@ -12,6 +12,7 @@ if platform.system().startswith("Windows"):
     os.environ["SANIC_NO_UVLOOP"] = "yes"
 
 p = Path(__file__) / "../sanic_jinja2/__init__.py"
+version = ""
 with p.resolve().open(encoding="utf-8") as f:
     for line in f:
         if line.startswith("__version__ = "):

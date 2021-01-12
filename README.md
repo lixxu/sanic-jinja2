@@ -41,13 +41,13 @@ BUG: request should not be set to global environment, so you need use request['f
 # -*- coding: utf-8 -*-
 
 from sanic import Sanic
-from sanic_session import Session
+from sanic_session import Session, InMemorySessionInterface
 from sanic_jinja2 import SanicJinja2
 
 app = Sanic()
-Session(app)
 
-jinja = SanicJinja2(app)
+session = Session(app, interface=InMemorySessionInterface())
+jinja = SanicJinja2(app, session=session)
 #
 # Specify the package name, if templates/ dir is inside module
 # jinja = SanicJinja2(app, pkg_name='sanicapp')
@@ -60,10 +60,11 @@ jinja = SanicJinja2(app)
 @app.route('/')
 @jinja.template('index.html')  # decorator method is staticmethod
 async def index(request):
-    request['flash']('success message', 'success')
-    request['flash']('info message', 'info')
-    request['flash']('warning message', 'warning')
-    request['flash']('error message', 'error')
+    jinja.flash(request, 'success message', 'success')
+    jinja.flash(request, 'info message', 'info')
+    jinja.flash(request, 'warning message', 'warning')
+    jinja.flash(request, 'error message', 'error')
+    jinja.session(request)["session key"] = "session value"
     return {'greetings': 'Hello, sanic!'}
 
 

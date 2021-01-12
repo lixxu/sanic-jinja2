@@ -12,7 +12,7 @@ from sanic.exceptions import ServerError
 from sanic.response import html, HTTPResponse
 from sanic.views import HTTPMethodView
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 CONTEXT_PROCESSORS = "context_processor"
 
@@ -23,6 +23,14 @@ def fake_trans(text, *args, **kwargs):
 
 def get_request_container(request):
     return request.ctx.__dict__ if hasattr(request, "ctx") else request
+
+
+def get_session_name(request):
+    jinja_obj = request.app.extensions.get("jinja2")
+    if jinja_obj:
+        return getattr(jinja_obj, "session_name", None) or "session"
+
+    return "session"
 
 
 def update_request_context(request, context):
@@ -37,9 +45,10 @@ def update_request_context(request, context):
         context.setdefault("ngettext", ng)
         context.setdefault("_", context["gettext"])
 
+    session_name = get_session_name(request)
     req = get_request_container(request)
-    if "session" in req:
-        context.setdefault("session", req["session"])
+    if session_name in req:
+        context.setdefault("session", req[session_name])
 
     context.setdefault("_", fake_trans)
     context.setdefault("request", request)
@@ -49,11 +58,12 @@ def update_request_context(request, context):
 
 
 def _get_flashed_messages(request, with_categories=False, category_filter=[]):
+    session_name = get_session_name(request)
     req = get_request_container(request)
-    if "session" not in req:
+    if session_name not in req:
         return []
 
-    flashes = req["session"].pop("_flashes", [])
+    flashes = req[session_name].pop("_flashes", [])
     if category_filter:
         flashes = list(filter(lambda f: f[0] in category_filter, flashes))
 
@@ -71,6 +81,7 @@ class SanicJinja2:
         pkg_name=None,
         pkg_path=None,
         context_processors=None,
+        session=None,
         **kwargs
     ):
         self.enable_async = kwargs.get("enable_async", False)
@@ -78,6 +89,7 @@ class SanicJinja2:
         self._loader = loader
         self.app = app
         self.context_processors = context_processors
+        self.__sess = session
 
         if app:
             self.init_app(app, loader, pkg_name or app.name, pkg_path)
@@ -119,8 +131,16 @@ class SanicJinja2:
             if "flash" not in req:
                 req["flash"] = partial(self._flash, req)
 
+    def init_session(self, session):
+        if session:
+            self.__sess = session
+
+    @property
+    def session_name(self):
+        return self.__sess.interface.session_name if self.__sess else "session"
+
     async def render_string_async(self, template, request, **context):
-        update_request_context(request, context)
+        self.update_request_context(request, context)
         return await self.env.get_template(template).render_async(**context)
 
     async def render_async(
@@ -133,11 +153,11 @@ class SanicJinja2:
         )
 
     def render_source(self, source, request, **context):
-        update_request_context(request, context)
+        self.update_request_context(request, context)
         return self.env.from_string(source).render(**context)
 
     def render_string(self, template, request, **context):
-        update_request_context(request, context)
+        self.update_request_context(request, context)
         return self.env.get_template(template).render(**context)
 
     def render(self, template, request, status=200, headers=None, **context):
@@ -152,11 +172,18 @@ class SanicJinja2:
 
     def _flash(self, request, message, category="message"):
         """need sanic_session extension"""
-        req = get_request_container(request)
-        if "session" in req:
-            flashes = req["session"].get("_flashes", [])
+        sess = self.session(request)
+        if sess:
+            flashes = sess.get("_flashes", [])
             flashes.append((category, message))
-            req["session"]["_flashes"] = flashes
+            sess["_flashes"] = flashes
+
+    def flash(self, request, message, category="message"):
+        self._flash(request, message, category)
+
+    def session(self, request):
+        req = get_request_container(request)
+        return req.get(self.session_name)
 
     @staticmethod
     def template(template_name, encoding="utf-8", headers=None, status=200):
