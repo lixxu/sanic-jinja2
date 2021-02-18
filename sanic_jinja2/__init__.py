@@ -173,7 +173,7 @@ class SanicJinja2:
     def _flash(self, request, message, category="message"):
         """need sanic_session extension"""
         sess = self.session(request)
-        if sess:
+        if sess is not None:
             flashes = sess.get("_flashes", [])
             flashes.append((category, message))
             sess["_flashes"] = flashes
