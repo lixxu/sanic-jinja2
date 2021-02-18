@@ -9,10 +9,10 @@ from functools import partial
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 from sanic.exceptions import ServerError
-from sanic.response import html, HTTPResponse
+from sanic.response import HTTPResponse, html
 from sanic.views import HTTPMethodView
 
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
 CONTEXT_PROCESSORS = "context_processor"
 

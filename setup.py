@@ -6,6 +6,7 @@ Jinja2 support for sanic
 import os
 import platform
 from pathlib import Path
+
 from setuptools import setup
 
 if platform.system().startswith("Windows"):
@@ -40,8 +41,6 @@ setup(
         "Programming Language :: Python",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3",
     ],
 )
