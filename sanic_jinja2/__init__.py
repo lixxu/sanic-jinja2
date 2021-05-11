@@ -12,7 +12,7 @@ from sanic.exceptions import ServerError
 from sanic.response import HTTPResponse, html
 from sanic.views import HTTPMethodView
 
-__version__ = "0.9.1"
+__version__ = "0.10.0"
 
 CONTEXT_PROCESSORS = "context_processor"
 
@@ -26,7 +26,7 @@ def get_request_container(request):
 
 
 def get_session_name(request):
-    jinja_obj = request.app.extensions.get("jinja2")
+    jinja_obj = request.app.ctx.extensions.get("jinja2")
     if jinja_obj:
         return getattr(jinja_obj, "session_name", None) or "session"
 
@@ -37,8 +37,8 @@ def update_request_context(request, context):
     if not request:
         return
 
-    if "babel" in request.app.extensions:
-        babel = request.app.babel_instance
+    if "babel" in request.app.ctx.extensions:
+        babel = request.app.ctx.babel_instance
         g = _make_new_gettext(babel._get_translations(request).ugettext)
         ng = _make_new_ngettext(babel._get_translations(request).ungettext)
         context.setdefault("gettext", g)
@@ -102,17 +102,17 @@ class SanicJinja2:
 
     def init_app(self, app, loader=None, pkg_name=None, pkg_path=None):
         self.app = app
-        if not hasattr(app, "extensions"):
-            app.extensions = {}
+        if not hasattr(app.ctx, "extensions"):
+            app.ctx.extensions = {}
 
         if self.context_processors:
             if not hasattr(app, CONTEXT_PROCESSORS):
                 setattr(app, CONTEXT_PROCESSORS, self.context_processors)
                 app.request_middleware.append(self.context_processors)
 
-        app.extensions["jinja2"] = self
-        app.jinja_env = self.env
-        app.enable_async = self.enable_async
+        app.ctx.extensions["jinja2"] = self
+        app.ctx.jinja_env = self.env
+        app.ctx.enable_async = self.enable_async
         if loader:
             self.env.loader = loader
         elif not self._loader:
@@ -222,7 +222,7 @@ class SanicJinja2:
                 if context is None:
                     context = {}
 
-                env = getattr(request.app, "jinja_env", None)
+                env = getattr(request.app.ctx, "jinja_env", None)
                 if not env:
                     raise ServerError(
                         "Template engine has not been initialized yet.",
@@ -246,7 +246,7 @@ class SanicJinja2:
                 #     context = dict(request[REQUEST_CONTEXT_KEY], **context)
                 update_request_context(request, context)
 
-                if request.app.enable_async:
+                if request.app.ctx.enable_async:
                     text = yield from template.render_async(context)
                 else:
                     text = template.render(context)

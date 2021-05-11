@@ -32,7 +32,8 @@ setup(
     packages=["sanic_jinja2"],
     zip_safe=False,
     platforms="any",
-    install_requires=["sanic", "jinja2"],
+    install_requires=["sanic>=21.3", "jinja2"],
+    python_requires=">=3.7",
     classifiers=[
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
