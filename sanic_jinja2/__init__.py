@@ -3,7 +3,12 @@
 
 import asyncio
 import functools
-from collections import Mapping
+
+try:
+    from collections import Mapping
+except ImportError:
+    from collections.abc import Mapping
+
 from functools import partial
 
 from jinja2 import Environment, PackageLoader, TemplateNotFound
@@ -12,7 +17,7 @@ from sanic.exceptions import ServerError
 from sanic.response import HTTPResponse, html
 from sanic.views import HTTPMethodView
 
-__version__ = "0.10.0"
+__version__ = "2021.12.25"
 
 CONTEXT_PROCESSORS = "context_processor"
 
