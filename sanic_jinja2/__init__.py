@@ -5,9 +5,9 @@ import asyncio
 import functools
 
 try:
-    from collections import Mapping
-except ImportError:
     from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 
 from functools import partial
 
@@ -17,7 +17,7 @@ from sanic.exceptions import ServerError
 from sanic.response import HTTPResponse, html
 from sanic.views import HTTPMethodView
 
-__version__ = "2021.12.25"
+__version__ = "2022.01.13"
 
 CONTEXT_PROCESSORS = "context_processor"
 
