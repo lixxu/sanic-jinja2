@@ -10,27 +10,30 @@ except ImportError:
     from collections import Mapping
 
 from functools import partial
+from typing import Any
 
 from jinja2 import Environment, PackageLoader, TemplateNotFound
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
+from sanic import Sanic
 from sanic.exceptions import ServerError
+from sanic.request import Request
 from sanic.response import HTTPResponse, html
 from sanic.views import HTTPMethodView
 
-__version__ = "2022.01.13"
+__version__ = "2022.11.10"
 
 CONTEXT_PROCESSORS = "context_processor"
 
 
-def fake_trans(text, *args, **kwargs):
+def fake_trans(text: Any, *args: Any, **kwargs: Any) -> Any:
     return text
 
 
-def get_request_container(request):
+def get_request_container(request: Request) -> dict:
     return request.ctx.__dict__ if hasattr(request, "ctx") else request
 
 
-def get_session_name(request):
+def get_session_name(request: Request) -> str:
     jinja_obj = request.app.ctx.extensions.get("jinja2")
     if jinja_obj:
         return getattr(jinja_obj, "session_name", None) or "session"
@@ -38,7 +41,7 @@ def get_session_name(request):
     return "session"
 
 
-def update_request_context(request, context):
+def update_request_context(request: Request, context: Any) -> None:
     if not request:
         return
 
@@ -62,7 +65,9 @@ def update_request_context(request, context):
     )
 
 
-def _get_flashed_messages(request, with_categories=False, category_filter=[]):
+def _get_flashed_messages(
+    request: Request, with_categories: bool = False, category_filter: list = []
+) -> list:
     session_name = get_session_name(request)
     req = get_request_container(request)
     if session_name not in req:
@@ -81,14 +86,14 @@ def _get_flashed_messages(request, with_categories=False, category_filter=[]):
 class SanicJinja2:
     def __init__(
         self,
-        app=None,
-        loader=None,
-        pkg_name=None,
-        pkg_path=None,
-        context_processors=None,
-        session=None,
-        **kwargs
-    ):
+        app: Any = None,
+        loader: Any = None,
+        pkg_name: str = None,
+        pkg_path: str = None,
+        context_processors: Any = None,
+        session: Any = None,
+        **kwargs: Any,
+    ) -> None:
         self.enable_async = kwargs.get("enable_async", False)
         self.env = Environment(loader=loader, **kwargs)
         self._loader = loader
@@ -99,13 +104,19 @@ class SanicJinja2:
         if app:
             self.init_app(app, loader, pkg_name or app.name, pkg_path)
 
-    def add_env(self, name, obj, scope="globals"):
+    def add_env(self, name: str, obj: Any, scope: str = "globals") -> None:
         if scope == "globals":
             self.env.globals[name] = obj
         elif scope == "filters":
             self.env.filters[name] = obj
 
-    def init_app(self, app, loader=None, pkg_name=None, pkg_path=None):
+    def init_app(
+        self,
+        app: Sanic,
+        loader: Any = None,
+        pkg_name: str = None,
+        pkg_path: str = None,
+    ) -> None:
         self.app = app
         if not hasattr(app.ctx, "extensions"):
             app.ctx.extensions = {}
@@ -131,51 +142,71 @@ class SanicJinja2:
         self.url_for = app.url_for
 
         @app.middleware("request")
-        async def add_flash_to_request(request):
+        async def add_flash_to_request(request: Request) -> None:
             req = get_request_container(request)
             if "flash" not in req:
                 req["flash"] = partial(self._flash, req)
 
-    def init_session(self, session):
+    def init_session(self, session: Any) -> None:
         if session:
             self.__sess = session
 
     @property
-    def session_name(self):
+    def session_name(self) -> str:
         return self.__sess.interface.session_name if self.__sess else "session"
 
-    async def render_string_async(self, template, request, **context):
+    async def render_string_async(
+        self, template: str, request: Request, **context: Any
+    ) -> Any:
         self.update_request_context(request, context)
         return await self.env.get_template(template).render_async(**context)
 
     async def render_async(
-        self, template, request, status=200, headers=None, **context
-    ):
+        self,
+        template: str,
+        request: Request,
+        status: int = 200,
+        headers: Any = None,
+        **context: Any,
+    ) -> Any:
         return html(
             await self.render_string_async(template, request, **context),
             status=status,
             headers=headers,
         )
 
-    def render_source(self, source, request, **context):
+    def render_source(
+        self, source: str, request: Request, **context: Any
+    ) -> Any:
         self.update_request_context(request, context)
         return self.env.from_string(source).render(**context)
 
-    def render_string(self, template, request, **context):
+    def render_string(
+        self, template: str, request: Request, **context: Any
+    ) -> Any:
         self.update_request_context(request, context)
         return self.env.get_template(template).render(**context)
 
-    def render(self, template, request, status=200, headers=None, **context):
+    def render(
+        self,
+        template: str,
+        request: Request,
+        status: int = 200,
+        headers: Any = None,
+        **context: Any,
+    ) -> Any:
         return html(
             self.render_string(template, request, **context),
             status=status,
             headers=headers,
         )
 
-    def update_request_context(self, request, context):
+    def update_request_context(self, request: Request, context: Any) -> None:
         update_request_context(request, context)
 
-    def _flash(self, request, message, category="message"):
+    def _flash(
+        self, request: Request, message: str, category: str = "message"
+    ) -> Any:
         """need sanic_session extension"""
         sess = self.session(request)
         if sess is not None:
@@ -183,15 +214,22 @@ class SanicJinja2:
             flashes.append((category, message))
             sess["_flashes"] = flashes
 
-    def flash(self, request, message, category="message"):
+    def flash(
+        self, request: Request, message: str, category: str = "message"
+    ) -> None:
         self._flash(request, message, category)
 
-    def session(self, request):
+    def session(self, request: Request) -> Any:
         req = get_request_container(request)
         return req.get(self.session_name)
 
     @staticmethod
-    def template(template_name, encoding="utf-8", headers=None, status=200):
+    def template(
+        template_name: str,
+        encoding: str = "utf-8",
+        headers: Any = None,
+        status: int = 200,
+    ) -> Any:
         """Decorate web-handler to convert returned dict context into
         sanic.response.Response
         filled with template_name template.
@@ -201,16 +239,13 @@ class SanicJinja2:
         :param context: context for rendering.
         """
 
-        def wrapper(func):
-            @asyncio.coroutine
+        def wrapper(func: Any) -> Any:
             @functools.wraps(func)
-            def wrapped(*args, **kwargs):
+            async def wrapped(*args: Any, **kwargs: Any):
                 if asyncio.iscoroutinefunction(func):
-                    coro = func
+                    context = await func(*args, **kwargs)
                 else:
-                    coro = asyncio.coroutine(func)
-
-                context = yield from coro(*args, **kwargs)
+                    context = func(*args, **kwargs)
 
                 # wrapped function return HTTPResponse
                 # instead of dict-like object
@@ -237,14 +272,12 @@ class SanicJinja2:
                     template = env.get_template(template_name)
                 except TemplateNotFound:
                     raise ServerError(
-                        "Template '{}' not found".format(template_name),
+                        f"Template '{template_name}' not found",
                         status_code=500,
                     )
                 if not isinstance(context, Mapping):
                     raise ServerError(
-                        "context should be mapping, not {}".format(
-                            type(context)
-                        ),
+                        f"context should be mapping, not {type(context)}",
                         status_code=500,
                     )
                 # if request.get(REQUEST_CONTEXT_KEY):
@@ -252,11 +285,11 @@ class SanicJinja2:
                 update_request_context(request, context)
 
                 if request.app.ctx.enable_async:
-                    text = yield from template.render_async(context)
+                    text = await template.render_async(context)
                 else:
                     text = template.render(context)
 
-                content_type = "text/html; charset={}".format(encoding)
+                content_type = f"text/html; charset={encoding}"
 
                 return HTTPResponse(
                     text,
