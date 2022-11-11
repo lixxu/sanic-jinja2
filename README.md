@@ -1,4 +1,5 @@
 # sanic-jinja2
+
 Jinja2 support for sanic
 
 ![Example](example/example.png)
@@ -16,7 +17,6 @@ Jinja2 support for sanic
 - `@jinja.template` syntax
 - [session extension](https://github.com/xen/sanic_session) support
 - factory pattern `init_app` method for creating apps
-
 
 ## Usage
 
@@ -40,6 +40,7 @@ BUG: request should not be set to global environment, so you need use request['f
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from jinja2 import FileSystemLoader
 from sanic import Sanic
 from sanic_session import Session, InMemorySessionInterface
 from sanic_jinja2 import SanicJinja2
@@ -47,7 +48,8 @@ from sanic_jinja2 import SanicJinja2
 app = Sanic()
 
 session = Session(app, interface=InMemorySessionInterface())
-jinja = SanicJinja2(app, session=session)
+loader = FileSystemLoader("templates")
+jinja = SanicJinja2(app, loader=loader, session=session)
 #
 # Specify the package name, if templates/ dir is inside module
 # jinja = SanicJinja2(app, pkg_name='sanicapp')
@@ -55,19 +57,43 @@ jinja = SanicJinja2(app, session=session)
 # jinja = SanicJinja2(app, pkg_name='sanicapp', pkg_path='other/templates')
 # or setup later
 # jinja = SanicJinja2()
-# jinja.init_app(app)
+# jinja.init_app(app, loader=leader)
 
-@app.route('/')
-@jinja.template('index.html')  # decorator method is staticmethod
+@app.route("/")
+@jinja.template("index.html")
 async def index(request):
-    jinja.flash(request, 'success message', 'success')
-    jinja.flash(request, 'info message', 'info')
-    jinja.flash(request, 'warning message', 'warning')
-    jinja.flash(request, 'error message', 'error')
-    jinja.session(request)["session key"] = "session value"
-    return {'greetings': 'Hello, sanic!'}
+    jinja.flash(request, "success message", "success")
+    jinja.flash(request, "info message", "info")
+    jinja.flash(request, "warning message", "warning")
+    jinja.flash(request, "error message", "error")
+    jinja.session(request)["user"] = "session user"
+    return dict(greetings="Hello, template decorator!")
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+@app.route("/normal")
+async def normal_index(request):
+    jinja.flash(request, "success message", "success")
+    jinja.flash(request, "info message", "info")
+    jinja.flash(request, "warning message", "warning")
+    jinja.flash(request, "error message", "error")
+    jinja.session(request)["user"] = "session user"
+    return jinja.render(
+        "normal_index.html", request, greetings="Hello, tempalte render!"
+    )
+
+
+@app.route("/sync-handler")
+@jinja.template("index.html")
+def sync_hander(request):
+    jinja.flash(request, "success message", "success")
+    jinja.flash(request, "info message", "info")
+    jinja.flash(request, "warning message", "warning")
+    jinja.flash(request, "error message", "error")
+    jinja.session(request)["user"] = "session user"
+    return dict(greetings="Hello, sync handler!")
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True, auto_reload=True)
+
 ```
