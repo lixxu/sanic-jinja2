@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from jinja2 import FileSystemLoader
 from sanic import Sanic
 from sanic_jinja2 import SanicJinja2
 from sanic_session import InMemorySessionInterface, Session
 
 app = Sanic(__name__)
-loader = FileSystemLoader("templates")
 
 session = Session(app, interface=InMemorySessionInterface())
-jinja = SanicJinja2(app, loader=loader, session=session)
+jinja = SanicJinja2(app, session=session)
 
 
 @app.route("/")

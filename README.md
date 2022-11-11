@@ -40,7 +40,6 @@ BUG: request should not be set to global environment, so you need use request['f
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from jinja2 import FileSystemLoader
 from sanic import Sanic
 from sanic_session import Session, InMemorySessionInterface
 from sanic_jinja2 import SanicJinja2
@@ -48,8 +47,8 @@ from sanic_jinja2 import SanicJinja2
 app = Sanic()
 
 session = Session(app, interface=InMemorySessionInterface())
-loader = FileSystemLoader("templates")
-jinja = SanicJinja2(app, loader=loader, session=session)
+
+jinja = SanicJinja2(app, session=session)
 #
 # Specify the package name, if templates/ dir is inside module
 # jinja = SanicJinja2(app, pkg_name='sanicapp')
@@ -57,7 +56,7 @@ jinja = SanicJinja2(app, loader=loader, session=session)
 # jinja = SanicJinja2(app, pkg_name='sanicapp', pkg_path='other/templates')
 # or setup later
 # jinja = SanicJinja2()
-# jinja.init_app(app, loader=leader)
+# jinja.init_app(app)
 
 @app.route("/")
 @jinja.template("index.html")
