@@ -12,7 +12,12 @@ except ImportError:
 from functools import partial
 from typing import Any
 
-from jinja2 import Environment, PackageLoader, TemplateNotFound
+from jinja2 import (
+    Environment,
+    FileSystemLoader,
+    PackageLoader,
+    TemplateNotFound,
+)
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 from sanic import Sanic
 from sanic.exceptions import ServerError
@@ -20,7 +25,7 @@ from sanic.request import Request
 from sanic.response import HTTPResponse, html
 from sanic.views import HTTPMethodView
 
-__version__ = "2022.11.10"
+__version__ = "2022.11.11"
 
 CONTEXT_PROCESSORS = "context_processor"
 
@@ -132,9 +137,13 @@ class SanicJinja2:
         if loader:
             self.env.loader = loader
         elif not self._loader:
-            loader = PackageLoader(
-                pkg_name or app.name, pkg_path or "templates"
-            )
+            try:
+                loader = PackageLoader(
+                    pkg_name or app.name, pkg_path or "templates"
+                )
+            except Exception:
+                loader = FileSystemLoader("templates")
+
             self.env.loader = loader
 
         self.add_env("app", app)
